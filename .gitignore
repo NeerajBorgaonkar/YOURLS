@@ -5,12 +5,14 @@
 .htaccess
 *.config
 *.conf
+!docker/apache-site.conf
 [Rr]obots.txt
 
 # Ignore everything in user/
 user/*
 # ... except config sample
 !user/config-sample.php
+!user/config.php
 # ... core plugins
 !user/plugins/hyphens-in-urls/
 !user/plugins/random-bg/

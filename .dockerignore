@@ -1,0 +1,14 @@
+.git
+.github
+.idea
+.vscode
+tests
+coverage
+build
+node_modules
+vendor/bin
+Dockerfile*
+docker-compose*.yml
+README.md
+readme.html
+CHANGELOG.md

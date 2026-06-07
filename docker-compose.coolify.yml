@@ -1,0 +1,47 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      YOURLS_SITE: "${YOURLS_SITE}"
+      YOURLS_DB_HOST: "db:3306"
+      YOURLS_DB_NAME: "${YOURLS_DB_NAME:-yourls}"
+      YOURLS_DB_USER: "${YOURLS_DB_USER:-yourls}"
+      YOURLS_DB_PASS: "${YOURLS_DB_PASS}"
+      YOURLS_DB_PREFIX: "${YOURLS_DB_PREFIX:-gk_}"
+      YOURLS_COOKIEKEY: "${YOURLS_COOKIEKEY}"
+      YOURLS_PRIVATE: "${YOURLS_PRIVATE:-true}"
+      YOURLS_UNIQUE_URLS: "${YOURLS_UNIQUE_URLS:-false}"
+      YOURLS_URL_CONVERT: "${YOURLS_URL_CONVERT:-62}"
+      YOURLS_DEBUG: "${YOURLS_DEBUG:-false}"
+      YOURLS_USER: "${YOURLS_USER}"
+      YOURLS_PASSWORD: "${YOURLS_PASSWORD}"
+      YOURLS_NO_VERSION_CHECK: "${YOURLS_NO_VERSION_CHECK:-false}"
+      GK_LINKS_APP_NAME: "${GK_LINKS_APP_NAME:-GK Links}"
+      GK_LINKS_TAGLINE: "${GK_LINKS_TAGLINE:-Your private short-link and tracking platform}"
+      GK_LINKS_LOGO_URL: "${GK_LINKS_LOGO_URL:-}"
+      GK_LINKS_FOOTER_HTML: "${GK_LINKS_FOOTER_HTML:-Powered by <a href=\"https://github.com/NeerajBorgaonkar/YOURLS\">GK Links</a>}"
+
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: "${YOURLS_DB_NAME:-yourls}"
+      MYSQL_USER: "${YOURLS_DB_USER:-yourls}"
+      MYSQL_PASSWORD: "${YOURLS_DB_PASS}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:

@@ -7,11 +7,16 @@
  */
 function yourls_html_logo() {
     yourls_do_action( 'pre_html_logo' );
+    $brand_name = defined( 'GK_LINKS_APP_NAME' ) && GK_LINKS_APP_NAME ? GK_LINKS_APP_NAME : 'YOURLS';
+    $brand_tagline = defined( 'GK_LINKS_TAGLINE' ) && GK_LINKS_TAGLINE ? GK_LINKS_TAGLINE : 'Your Own URL Shortener';
+    $logo_url = defined( 'GK_LINKS_LOGO_URL' ) && GK_LINKS_LOGO_URL ? GK_LINKS_LOGO_URL : yourls_site_url( false ) . '/images/yourls-logo.svg';
     ?>
     <header role="banner">
     <h1>
-        <a href="<?php echo yourls_admin_url( 'index.php' ) ?>" title="YOURLS"><span>YOURLS</span>: <span>Y</span>our <span>O</span>wn <span>URL</span> <span>S</span>hortener<br/>
-        <img src="<?php yourls_site_url(); ?>/images/yourls-logo.svg?v=<?php echo YOURLS_VERSION; ?>" id="yourls-logo" alt="YOURLS" title="YOURLS" /></a>
+        <a href="<?php echo yourls_admin_url( 'index.php' ) ?>" title="<?php echo yourls_esc_attr( $brand_name ); ?>">
+            <span><?php echo yourls_esc_html( $brand_name ); ?></span>: <span><?php echo yourls_esc_html( $brand_tagline ); ?></span><br/>
+            <img src="<?php echo yourls_esc_attr( $logo_url ); ?>" id="yourls-logo" alt="<?php echo yourls_esc_attr( $brand_name ); ?>" title="<?php echo yourls_esc_attr( $brand_name ); ?>" />
+        </a>
     </h1>
     </header>
     <?php
@@ -77,7 +82,9 @@ function yourls_html_head( $context = 'index', $title = '' ) {
     $bodyclass .= ( yourls_is_mobile_device() ? 'mobile' : 'desktop' );
 
     // Page title
-    $_title = 'YOURLS &mdash; Your Own URL Shortener | ' . yourls_link();
+    $brand_name = defined( 'GK_LINKS_APP_NAME' ) && GK_LINKS_APP_NAME ? GK_LINKS_APP_NAME : 'YOURLS';
+    $brand_tagline = defined( 'GK_LINKS_TAGLINE' ) && GK_LINKS_TAGLINE ? GK_LINKS_TAGLINE : 'Your Own URL Shortener';
+    $_title = $brand_name . ' &mdash; ' . $brand_tagline . ' | ' . yourls_link();
     $_title = empty($_title_page) ? $_title : $_title_page . ' &mdash; ' . $_title;
     $title = $title ? $title . " &laquo; " . $_title : $_title;
     $title = yourls_apply_filter( 'html_title', $title, $context );
@@ -88,8 +95,8 @@ function yourls_html_head( $context = 'index', $title = '' ) {
 <head>
     <title><?php echo yourls_esc_html($title); ?></title>
     <meta http-equiv="Content-Type" content="<?php echo yourls_apply_filter( 'html_head_meta_content-type', 'text/html; charset=utf-8' ); ?>" />
-    <meta name="generator" content="YOURLS <?php echo YOURLS_VERSION ?>" />
-    <meta name="description" content="YOURLS &raquo; Your Own URL Shortener' | <?php yourls_site_url(); ?>" />
+    <meta name="generator" content="<?php echo yourls_esc_attr( $brand_name ); ?> <?php echo YOURLS_VERSION ?>" />
+    <meta name="description" content="<?php echo yourls_esc_attr( $brand_name . ' - ' . $brand_tagline ); ?> | <?php yourls_site_url(); ?>" />
     <?php yourls_do_action('html_head_meta', $context); ?>
     <?php yourls_html_favicon(); ?>
     <script src="<?php yourls_site_url(); ?>/js/jquery-3.5.1.min.js?v=<?php echo YOURLS_VERSION; ?>" type="text/javascript"></script>
@@ -157,7 +164,11 @@ function yourls_html_footer($can_query = true) {
     </div><?php // wrap ?>
     <footer id="footer" role="contentinfo"><p>
         <?php
-        $footer  = yourls_s( 'Powered by %s', '<a href="http://yourls.org/" title="YOURLS">YOURLS</a> v ' . YOURLS_VERSION );
+        if ( defined( 'GK_LINKS_FOOTER_HTML' ) && GK_LINKS_FOOTER_HTML ) {
+            $footer = GK_LINKS_FOOTER_HTML;
+        } else {
+            $footer  = yourls_s( 'Powered by %s', '<a href="http://yourls.org/" title="YOURLS">YOURLS</a> v ' . YOURLS_VERSION );
+        }
         $footer .= $num_queries;
         echo yourls_apply_filter( 'html_footer_text', $footer );
         ?>

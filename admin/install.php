@@ -56,7 +56,11 @@ yourls_html_head( 'install', yourls__( 'Install YOURLS' ) );
 <div id="login">
     <form method="post" action="?"><?php // reset any QUERY parameters ?>
         <p>
-            <img src="<?php yourls_site_url(); ?>/images/yourls-logo.svg" id="yourls-logo" alt="YOURLS" title="YOURLS" />
+            <?php
+            $logo_url = defined( 'GK_LINKS_LOGO_URL' ) && GK_LINKS_LOGO_URL ? GK_LINKS_LOGO_URL : yourls_site_url( false ) . '/images/yourls-logo.svg';
+            $brand_name = defined( 'GK_LINKS_APP_NAME' ) && GK_LINKS_APP_NAME ? GK_LINKS_APP_NAME : 'YOURLS';
+            ?>
+            <img src="<?php echo yourls_esc_attr( $logo_url ); ?>" id="yourls-logo" alt="<?php echo yourls_esc_attr( $brand_name ); ?>" title="<?php echo yourls_esc_attr( $brand_name ); ?>" />
         </p>
         <?php
             // Print errors, warnings and success messages
