@@ -95,7 +95,6 @@ if ( $click_limit !== '' ) {
     $click_filter   = '';
 }
 
-
 // Get URLs Count for current filter, total links in DB & total clicks
 list( $total_urls, $total_clicks ) = array_values( yourls_get_db_stats() );
 if ( !empty($where['sql']) ) {
@@ -104,26 +103,6 @@ if ( !empty($where['sql']) ) {
     $total_items        = $total_urls;
     $total_items_clicks = false;
 }
-
-$today_clicks = 0;
-if ( yourls_do_log_redirect() ) {
-    $offset = yourls_get_time_offset();
-    $table_log = YOURLS_DB_TABLE_LOG;
-    $today_clicks = (int) yourls_get_db('read-admin_today_clicks')->fetchValue(
-        "SELECT COUNT(*) FROM `$table_log` WHERE DATE(DATE_ADD(`click_time`, INTERVAL $offset HOUR)) = DATE(DATE_ADD(CURRENT_TIMESTAMP, INTERVAL $offset HOUR))"
-    );
-}
-
-$top_link = yourls_get_db('read-admin_top_link')->fetchObject(
-    "SELECT `keyword`, `url`, `title`, `clicks` FROM `$table_url` ORDER BY `clicks` DESC, `timestamp` DESC LIMIT 1"
-);
-$top_link_keyword = $top_link ? yourls_sanitize_keyword( $top_link->keyword ) : '';
-$top_link_shorturl = $top_link_keyword ? yourls_link( $top_link_keyword ) : '';
-$top_link_title = '';
-if ( $top_link ) {
-    $top_link_title = $top_link->title ? $top_link->title : $top_link->url;
-}
-$top_link_clicks = $top_link ? (int) $top_link->clicks : 0;
 
 // This is a bookmarklet
 if ( isset( $_GET['u'] ) or isset( $_GET['up'] ) ) {
@@ -174,43 +153,34 @@ if ( isset( $_GET['u'] ) or isset( $_GET['up'] ) ) {
         yourls_do_action( 'pre_share_redirect' );
         switch ( $_GET['share'] ) {
             case 'twitter':
-                // share with Twitter
                 $destination = sprintf( "https://twitter.com/intent/tweet?url=%s&text=%s", urlencode( $return['shorturl'] ), urlencode( $title ) );
                 yourls_redirect( $destination, 303 );
 
-                // Deal with the case when redirection failed:
                 $return['status']    = 'error';
                 $return['errorCode'] = '400';
                 $return['message']   = yourls_s( 'Short URL created, but could not redirect to %s !', 'Twitter' );
                 break;
 
             case 'facebook':
-                // share with Facebook
                 $destination = sprintf( "https://www.facebook.com/sharer/sharer.php?u=%s&t=%s", urlencode( $return['shorturl'] ), urlencode( $title ) );
                 yourls_redirect( $destination, 303 );
 
-                // Deal with the case when redirection failed:
                 $return['status']    = 'error';
                 $return['errorCode'] = '400';
                 $return['message']   = yourls_s( 'Short URL created, but could not redirect to %s !', 'Facebook' );
                 break;
 
             case 'tumblr':
-                // share with Tumblr
                 $destination = sprintf( "https://www.tumblr.com/share?v=3&u=%s&t=%s&s=%s", urlencode( $return['shorturl'] ), urlencode( $title ), urlencode( $text ) );
                 yourls_redirect( $destination, 303 );
 
-                // Deal with the case when redirection failed:
                 $return['status']    = 'error';
                 $return['errorCode'] = '400';
                 $return['message']   = yourls_s( 'Short URL created, but could not redirect to %s !', 'Tumblr' );
                 break;
 
             default:
-                // Is there a custom registered social bookmark?
                 yourls_do_action( 'share_redirect_' . $_GET['share'], $return );
-
-                // Still here? That was an unknown 'share' method, then.
                 $return['status']    = 'error';
                 $return['errorCode'] = '400';
                 $return['message']   = yourls__( 'Unknown "Share" bookmarklet' );
@@ -222,7 +192,6 @@ if ( isset( $_GET['u'] ) or isset( $_GET['up'] ) ) {
 } else {
     $is_bookmark = false;
 
-    // Checking $page, $offset, $perpage
     if( empty($page) || $page == 0 ) {
         $page = 1;
     }
@@ -233,96 +202,33 @@ if ( isset( $_GET['u'] ) or isset( $_GET['up'] ) ) {
         $perpage = 50;
     }
 
-    // Determine $offset
     $offset = ( $page-1 ) * $perpage;
 
-    // Determine Max Number Of Items To Display On Page
     if( ( $offset + $perpage ) > $total_items ) {
         $max_on_page = $total_items;
     } else {
         $max_on_page = ( $offset + $perpage );
     }
 
-    // Determine Number Of Items To Display On Page
     if ( ( $offset + 1 ) > $total_items ) {
         $display_on_page = $total_items;
     } else {
         $display_on_page = ( $offset + 1 );
     }
 
-    // Determine Total Amount Of Pages
     $total_pages = ceil( $total_items / $perpage );
 }
 
-
-// Begin output of the page
 $context = ( $is_bookmark ? 'bookmark' : 'index' );
 yourls_html_head( $context );
 yourls_html_logo();
-yourls_html_menu() ;
+yourls_html_menu();
 
 yourls_do_action( 'admin_page_before_content' );
-
-if ( !$is_bookmark ) { ?>
-    <section class="dashboard_intro">
-        <div class="dashboard_intro_copy">
-            <span class="eyebrow"><?php yourls_e( 'GK Links Dashboard' ); ?></span>
-            <h2><?php yourls_e( 'Modern link management with full YOURLS power underneath.' ); ?></h2>
-            <p><?php
-                if ( $total_items === 0 ) {
-                    printf( yourls__( 'No URLs.' ) );
-                    if ( ! empty( $search ) ) {
-                        printf( ' ' . yourls__( 'Try being less specific' ) );
-                    }
-                } else {
-                    printf( yourls__( 'Display <strong>%1$s</strong> to <strong class="increment">%2$s</strong> of <strong class="increment">%3$s</strong> URLs' ), $display_on_page, $max_on_page, $total_items );
-                    if( $total_items_clicks !== false ) {
-                        echo ', ' . sprintf( yourls_n( 'counting <strong>1</strong> click', 'counting <strong>%s</strong> clicks', $total_items_clicks ), yourls_number_format_i18n( $total_items_clicks ) );
-                    }
-                    echo '.';
-                }
-            ?></p>
-            <?php if ( $search_sentence ) { ?>
-                <p class="dashboard_search_sentence"><?php echo $search_sentence; ?></p>
-            <?php } ?>
-        </div>
-        <div class="dashboard_stat_grid">
-            <article class="stat_card">
-                <span class="stat_label"><?php yourls_e( 'Total Links' ); ?></span>
-                <strong class="stat_value increment"><?php echo yourls_number_format_i18n( $total_urls ); ?></strong>
-                <small><?php yourls_e( 'All active short links in the workspace.' ); ?></small>
-            </article>
-            <article class="stat_card">
-                <span class="stat_label"><?php yourls_e( 'Total Clicks' ); ?></span>
-                <strong id="dashboard-total-clicks" class="stat_value"><?php echo yourls_number_format_i18n( $total_clicks ); ?></strong>
-                <small><?php yourls_e( 'Cumulative tracked visits across all links.' ); ?></small>
-            </article>
-            <article class="stat_card">
-                <span class="stat_label"><?php yourls_e( 'Today\'s Clicks' ); ?></span>
-                <strong class="stat_value"><?php echo yourls_number_format_i18n( $today_clicks ); ?></strong>
-                <small><?php yourls_e( 'Clicks recorded during the current day.' ); ?></small>
-            </article>
-            <article class="stat_card stat_card_top_link">
-                <span class="stat_label"><?php yourls_e( 'Top Link' ); ?></span>
-                <?php if ( $top_link_shorturl ) { ?>
-                    <strong class="stat_value"><a href="<?php echo yourls_esc_url( $top_link_shorturl ); ?>"><?php echo yourls_esc_html( yourls_trim_long_string( $top_link_title, 28 ) ); ?></a></strong>
-                    <small><?php echo yourls_number_format_i18n( $top_link_clicks ); ?> <?php yourls_e( 'clicks' ); ?> · <a href="<?php echo yourls_esc_url( yourls_statlink( $top_link_keyword ) ); ?>"><?php yourls_e( 'View stats' ); ?></a></small>
-                <?php } else { ?>
-                    <strong class="stat_value"><?php yourls_e( 'No data yet' ); ?></strong>
-                    <small><?php yourls_e( 'Create your first short link to populate insights.' ); ?></small>
-                <?php } ?>
-            </article>
-        </div>
-    </section>
-    <p id="overall_tracking"><?php printf( yourls__( 'Overall, tracking <strong class="increment">%1$s</strong> links, <strong>%2$s</strong> clicks, and counting!' ), yourls_number_format_i18n( $total_urls ), yourls_number_format_i18n( $total_clicks ) ); ?></p>
-<?php } ?>
-<?php
-
 yourls_do_action( 'admin_page_before_form' );
 
 yourls_html_addnew();
 
-// If bookmarklet, add message. Otherwise, hide hidden share box.
 if ( !$is_bookmark ) {
     yourls_share_box( '', '', '', '', '', '', true );
 } else {
@@ -334,15 +240,9 @@ if ( !$is_bookmark ) {
 
 yourls_do_action( 'admin_page_before_table' );
 
-if ( !$is_bookmark ) { ?>
-    <section id="links-table-section" class="links_section_heading">
-        <div class="section_heading">
-            <span class="eyebrow"><?php yourls_e( 'Links Area' ); ?></span>
-            <h2><?php yourls_e( 'Manage short links' ); ?></h2>
-            <p><?php yourls_e( 'Review performance, copy URLs, edit destinations, and remove links without leaving the dashboard.' ); ?></p>
-        </div>
-    </section>
-<?php }
+if ( !$is_bookmark && $search_sentence ) {
+    echo '<p class="links_search_state">' . $search_sentence . '</p>';
+}
 
 yourls_table_head();
 
@@ -367,7 +267,6 @@ if ( !$is_bookmark ) {
 
 yourls_table_tbody_start();
 
-// Main Query
 $where = yourls_apply_filter( 'admin_list_where', $where );
 $url_results = yourls_get_db('read-admin_index')->fetchObjects( "SELECT * FROM `$table_url` WHERE 1=1 {$where['sql']} ORDER BY `$sort_by` $sort_order LIMIT $offset, $perpage;", $where['binds'] );
 $found_rows = false;
@@ -389,15 +288,15 @@ $display = $found_rows ? 'display:none' : '';
 echo '<tr id="nourl_found" style="'.$display.'"><td colspan="5">' . yourls__('No URL') . '</td></tr>';
 
 yourls_table_tbody_end();
-
 yourls_table_end();
 
 yourls_do_action( 'admin_page_after_table' );
 
 yourls_delete_link_modal();
 
-if ( $is_bookmark )
+if ( $is_bookmark ) {
     yourls_share_box( $url, $return['shorturl'], $title, $text );
+}
 ?>
 
-<?php yourls_html_footer( ); ?>
+<?php yourls_html_footer(); ?>

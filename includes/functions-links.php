@@ -253,6 +253,16 @@ function yourls_get_yourls_favicon_url( $echo = true ) {
     }
 
     $custom = null;
+
+    if ( file_exists( YOURLS_ABSPATH . '/favicon.ico' ) ) {
+        $favicon = yourls_site_url( false, 'favicon.ico' );
+        $favicon = yourls_apply_filter('get_favicon_url', $favicon);
+        if( $echo ) {
+            echo $favicon;
+        }
+        return $favicon;
+    }
+
     // search for favicon.(gif|ico|png|jpg|svg)
     foreach( array( 'gif', 'ico', 'png', 'jpg', 'svg' ) as $ext ) {
         if( file_exists( YOURLS_USERDIR. '/favicon.' . $ext ) ) {

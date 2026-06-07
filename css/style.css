@@ -66,28 +66,28 @@ main,
 #app_header {
     background: rgba(23, 23, 23, 0.88);
     border: 1px solid var(--gk-border);
-    border-radius: 28px;
+    border-radius: 24px;
     box-shadow: var(--gk-shadow);
-    margin-bottom: 18px;
-    padding: 18px 24px;
+    margin-bottom: 14px;
+    padding: 14px 20px;
 }
 
 .brand_lockup {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 .brand_mark {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(255, 214, 0, 0.18), rgba(255, 214, 0, 0.05));
-    border: 1px solid var(--gk-border-strong);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px;
 }
 
 .brand_copy {
@@ -106,39 +106,39 @@ h3 {
 }
 
 .brand_copy strong {
-    font-size: 2.4rem;
+    font-size: 2rem;
     line-height: 0.9;
 }
 
 .brand_copy small {
     color: var(--gk-text-soft);
-    font-size: 1rem;
+    font-size: 0.9rem;
     line-height: 1.1;
 }
 
 #yourls-logo {
-    max-width: 36px;
-    max-height: 36px;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 #top_navigation {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 18px;
+    gap: 12px;
     background: rgba(23, 23, 23, 0.88);
     border: 1px solid var(--gk-border);
-    border-radius: 28px;
+    border-radius: 24px;
     box-shadow: var(--gk-shadow);
-    margin-bottom: 20px;
-    padding: 10px 16px;
+    margin-bottom: 18px;
+    padding: 8px 12px;
 }
 
 ul#admin_menu {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    gap: 12px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -150,7 +150,8 @@ ul#admin_menu > li {
 }
 
 ul#admin_menu > li > a,
-.admin_menu_user {
+.admin_menu_user,
+.hamburger_menu summary {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
@@ -167,11 +168,8 @@ ul#admin_menu > li > a:focus {
     color: var(--gk-text);
 }
 
-.admin_menu_secondary {
-    margin-left: auto;
-}
-
-#admin_menu_help_link {
+.admin_menu_secondary,
+.admin_menu_hamburger {
     margin-left: auto;
 }
 
@@ -181,15 +179,44 @@ ul#admin_menu > li > a:focus {
     color: var(--gk-text);
 }
 
-ul#admin_menu ul {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    min-width: 220px;
+.admin_menu_primary a {
+    background: rgba(255, 214, 0, 0.1);
+    color: var(--gk-text);
+}
+
+.hamburger_menu {
+    position: relative;
+}
+
+.hamburger_menu summary {
+    justify-content: center;
+    gap: 4px;
+    width: 52px;
+    padding: 0;
     list-style: none;
-    margin: 0;
-    padding: 10px;
+    cursor: pointer;
+}
+
+.hamburger_menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.hamburger_menu summary span {
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    display: block;
+}
+
+.hamburger_panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 240px;
+    display: grid;
+    gap: 6px;
+    padding: 12px;
     border: 1px solid var(--gk-border);
     border-radius: 20px;
     background: rgba(32, 32, 32, 0.98);
@@ -197,21 +224,32 @@ ul#admin_menu ul {
     z-index: 30;
 }
 
-ul#admin_menu li:hover > ul,
-ul#admin_menu li:focus-within > ul {
-    display: block;
+.hamburger_user {
+    padding: 10px 12px 12px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--gk-text-soft);
+    font-size: 0.92rem;
 }
 
-ul#admin_menu ul li a {
+.hamburger_link,
+.hamburger_link a {
     display: block;
     padding: 10px 12px;
     border-radius: 12px;
     color: var(--gk-text-soft);
 }
 
-ul#admin_menu ul li a:hover {
+.hamburger_link:hover,
+.hamburger_link a:hover {
     background: rgba(255, 214, 0, 0.08);
     color: var(--gk-text);
+}
+
+.hamburger_logout {
+    margin-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 8px;
 }
 
 main,
@@ -238,13 +276,6 @@ main {
     margin-bottom: 20px;
 }
 
-.dashboard_intro {
-    display: grid;
-    gap: 24px;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    padding: 28px;
-}
-
 .dashboard_intro_copy h2,
 .section_heading h2,
 #login h2 {
@@ -259,7 +290,6 @@ main {
 #overall_tracking {
     color: var(--gk-text-soft);
     margin: 0;
-    display: none;
 }
 
 .dashboard_search_sentence {
@@ -284,52 +314,13 @@ main {
     background: currentColor;
 }
 
-.dashboard_stat_grid {
-    display: grid;
-    gap: 14px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.stat_card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-height: 132px;
-    padding: 18px;
-    border-radius: 24px;
-    background: linear-gradient(180deg, rgba(38, 38, 38, 0.92), rgba(26, 26, 26, 0.98));
-    border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.stat_card_top_link {
-    grid-column: span 2;
-}
-
-.stat_label {
-    color: var(--gk-text-soft);
-    font-size: 0.95rem;
-}
-
-.stat_value {
-    font-family: "Teko", sans-serif;
-    font-size: 3rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    line-height: 0.9;
-    color: var(--gk-text);
-}
-
-.stat_card small {
-    color: var(--gk-text-soft);
-}
-
 #new_url {
-    padding: 24px;
+    padding: 20px;
 }
 
 .quick-create-shell {
     display: grid;
-    gap: 18px;
+    gap: 14px;
 }
 
 .quick-create-grid {
@@ -436,6 +427,11 @@ input.disabled,
 
 .links_section_heading {
     padding: 24px;
+}
+
+.links_search_state {
+    margin: 0 0 14px;
+    color: var(--gk-text-soft);
 }
 
 .section_heading {
@@ -734,27 +730,17 @@ a.bookmarklet:hover {
 }
 
 @media (max-width: 980px) {
-    .dashboard_intro,
-    .dashboard_stat_grid,
     .quick-create-grid {
         grid-template-columns: 1fr;
     }
 
-    .stat_card_top_link {
-        grid-column: span 1;
-    }
-
     #top_navigation {
-        align-items: flex-start;
+        align-items: center;
     }
 
-    #admin_menu_help_link,
-    .admin_menu_secondary {
-        margin-left: 0;
-    }
-
-    ul#admin_menu {
-        gap: 8px;
+    .hamburger_panel {
+        right: 0;
+        left: auto;
     }
 }
 
@@ -767,7 +753,6 @@ a.bookmarklet:hover {
     #top_navigation,
     main,
     #new_url,
-    .dashboard_intro,
     .links_section_heading,
     #login,
     #footer p,
@@ -779,29 +764,30 @@ a.bookmarklet:hover {
     #top_navigation,
     main,
     #new_url,
-    .dashboard_intro,
     .links_section_heading,
     #login,
     .sub_wrap {
         padding: 18px;
     }
 
-    .brand_lockup {
-        align-items: flex-start;
+    .brand_copy small {
+        display: none;
     }
 
     .brand_copy strong {
         font-size: 2rem;
     }
 
-    ul#admin_menu > li {
-        width: calc(50% - 6px);
+    #top_navigation {
+        padding: 8px 10px;
     }
 
-    ul#admin_menu > li > a,
-    .admin_menu_user {
-        width: 100%;
-        justify-content: center;
+    ul#admin_menu {
+        gap: 8px;
+    }
+
+    .admin_menu_primary {
+        flex: 1 1 auto;
     }
 
     .cell_label {
@@ -815,5 +801,9 @@ a.bookmarklet:hover {
 
     td.actions .action_stack {
         justify-content: flex-start;
+    }
+
+    .hamburger_panel {
+        min-width: min(240px, calc(100vw - 32px));
     }
 }

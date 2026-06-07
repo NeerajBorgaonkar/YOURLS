@@ -265,11 +265,17 @@ function decrement_counter() {
 function decrease_total_clicks( id ) {
 	var total_clicks = $("#overall_tracking strong:nth-child(2)");
 	var dashboard_total_clicks = $("#dashboard-total-clicks");
-	var next_total = Math.max(0, numeric_value_from_text(total_clicks.text()) - numeric_value_from_text($('#clicks-' + id).text()));
-	total_clicks.html(
-		format_dashboard_number(next_total)
-	);
-	dashboard_total_clicks.html(format_dashboard_number(next_total));
+	if (!total_clicks.length && !dashboard_total_clicks.length) {
+		return;
+	}
+	var currentTotal = total_clicks.length ? numeric_value_from_text(total_clicks.text()) : numeric_value_from_text(dashboard_total_clicks.text());
+	var next_total = Math.max(0, currentTotal - numeric_value_from_text($('#clicks-' + id).text()));
+	if (total_clicks.length) {
+		total_clicks.html(format_dashboard_number(next_total));
+	}
+	if (dashboard_total_clicks.length) {
+		dashboard_total_clicks.html(format_dashboard_number(next_total));
+	}
 }
 
 // Toggle Share box

@@ -9,7 +9,7 @@ function yourls_html_logo() {
     yourls_do_action( 'pre_html_logo' );
     $brand_name = defined( 'GK_LINKS_APP_NAME' ) && GK_LINKS_APP_NAME ? GK_LINKS_APP_NAME : 'YOURLS';
     $brand_tagline = defined( 'GK_LINKS_TAGLINE' ) && GK_LINKS_TAGLINE ? GK_LINKS_TAGLINE : 'Your Own URL Shortener';
-    $logo_url = defined( 'GK_LINKS_LOGO_URL' ) && GK_LINKS_LOGO_URL ? GK_LINKS_LOGO_URL : yourls_site_url( false ) . '/images/yourls-logo.svg';
+    $logo_url = defined( 'GK_LINKS_LOGO_URL' ) && GK_LINKS_LOGO_URL ? GK_LINKS_LOGO_URL : yourls_site_url( false ) . '/images/gklogo.png';
     ?>
     <header id="app_header" role="banner">
         <a class="brand_lockup" href="<?php echo yourls_admin_url( 'index.php' ) ?>" title="<?php echo yourls_esc_attr( $brand_name ); ?>">
@@ -874,69 +874,65 @@ function yourls_html_menu() {
     } else {
         $logout_link = yourls_apply_filter( 'logout_link', '' );
     }
-    $help_link   = yourls_apply_filter( 'help_link',   '<a href="' . yourls_site_url( false ) .'/readme.html">' . yourls__( 'Help' ) . '</a>' );
+    $help_link = yourls_apply_filter( 'help_link', '<a href="' . yourls_site_url( false ) .'/readme.html">' . yourls__( 'Help' ) . '</a>' );
 
-    $admin_links    = array();
-    $admin_sublinks = array();
-
-    $admin_links['dashboard'] = array(
-        'url'    => yourls_admin_url( 'index.php' ),
-        'title'  => yourls__( 'Go to the dashboard' ),
-        'anchor' => yourls__( 'Dashboard' )
-    );
-    $admin_links['links'] = array(
-        'url'    => yourls_admin_url( 'index.php' ) . '#links-table-section',
-        'title'  => yourls__( 'Jump to links' ),
-        'anchor' => yourls__( 'Links' )
+    $primary_links = array(
+        'links' => array(
+            'url'    => yourls_admin_url( 'index.php' ) . '#links-table-section',
+            'title'  => yourls__( 'Manage links' ),
+            'anchor' => yourls__( 'Links' ),
+        ),
     );
 
+    $secondary_links = array();
     if( yourls_is_admin() ) {
-        $admin_links['tools'] = array(
+        $secondary_links['tools'] = array(
             'url'    => yourls_admin_url( 'tools.php' ),
-            'anchor' => yourls__( 'Tools' )
+            'anchor' => yourls__( 'Tools' ),
         );
-        $admin_links['settings'] = array(
+        $secondary_links['settings'] = array(
             'url'    => yourls_admin_url( 'plugins.php' ),
-            'anchor' => yourls__( 'Settings' )
+            'anchor' => yourls__( 'Settings' ),
         );
-        $admin_sublinks['settings'] = yourls_list_plugin_admin_pages();
-    }
 
-    $admin_links    = yourls_apply_filter( 'admin_links',    $admin_links );
-    $admin_sublinks = yourls_apply_filter( 'admin_sublinks', $admin_sublinks );
-
-    // Now output menu
-    echo '<nav id="top_navigation" role="navigation"><ul id="admin_menu">'."\n";
-
-    foreach( (array)$admin_links as $link => $ar ) {
-        if( isset( $ar['url'] ) ) {
-            $anchor = isset( $ar['anchor'] ) ? $ar['anchor'] : $link;
-            $title  = isset( $ar['title'] ) ? 'title="' . $ar['title'] . '"' : '';
-            printf( '<li id="admin_menu_%s_link" class="admin_menu_toplevel"><a href="%s" %s>%s</a>', $link, $ar['url'], $title, $anchor );
-        }
-        // Output submenu if any. TODO: clean up, too many code duplicated here
-        if( isset( $admin_sublinks[$link] ) ) {
-            echo "<ul>\n";
-            foreach( $admin_sublinks[$link] as $link => $ar ) {
-                if( isset( $ar['url'] ) ) {
-                    $anchor = isset( $ar['anchor'] ) ? $ar['anchor'] : $link;
-                    $title  = isset( $ar['title'] ) ? 'title="' . $ar['title'] . '"' : '';
-                    printf( '<li id="admin_menu_%s_link" class="admin_menu_sublevel admin_menu_sublevel_%s"><a href="%s" %s>%s</a>', $link, $link, $ar['url'], $title, $anchor );
-                }
+        foreach( (array) yourls_list_plugin_admin_pages() as $slug => $ar ) {
+            if( isset( $ar['url'] ) ) {
+                $secondary_links[ 'plugin_' . $slug ] = array(
+                    'url'    => $ar['url'],
+                    'anchor' => isset( $ar['anchor'] ) ? $ar['anchor'] : $slug,
+                );
             }
-            echo "</ul>\n";
         }
     }
 
-    if ( isset( $help_link ) )
-        echo '<li id="admin_menu_help_link" class="admin_menu_secondary">' . $help_link .'</li>';
-    if ( $current_user )
-        echo '<li id="admin_menu_user" class="admin_menu_secondary admin_menu_user">' . yourls_esc_html( $current_user ) . '</li>';
-    if ( yourls_is_private() && !empty( $logout_link ) )
-        echo '<li id="admin_menu_logout_link" class="admin_menu_secondary">' . $logout_link .'</li>';
+    echo '<nav id="top_navigation" role="navigation"><ul id="admin_menu">'."\n";
+    foreach( $primary_links as $link => $ar ) {
+        $title = isset( $ar['title'] ) ? 'title="' . $ar['title'] . '"' : '';
+        printf( '<li id="admin_menu_%s_link" class="admin_menu_toplevel admin_menu_primary"><a href="%s" %s>%s</a></li>', $link, $ar['url'], $title, $ar['anchor'] );
+    }
 
+    echo '<li id="admin_menu_more" class="admin_menu_secondary admin_menu_hamburger">';
+    echo '<details class="hamburger_menu">';
+    echo '<summary aria-label="' . yourls_esc_attr__( 'Open menu' ) . '"><span></span><span></span><span></span></summary>';
+    echo '<div class="hamburger_panel">';
+    if ( $current_user ) {
+        echo '<div class="hamburger_user">' . yourls_esc_html( $current_user ) . '</div>';
+    }
+    foreach( $secondary_links as $link => $ar ) {
+        printf( '<a class="hamburger_link" href="%s">%s</a>', $ar['url'], $ar['anchor'] );
+    }
+    if ( isset( $help_link ) ) {
+        echo '<div class="hamburger_link">' . $help_link . '</div>';
+    }
+    if ( yourls_is_private() && !empty( $logout_link ) ) {
+        echo '<div class="hamburger_link hamburger_logout">' . $logout_link . '</div>';
+    }
     yourls_do_action( 'admin_menu' );
+    echo '</div>';
+    echo '</details>';
+    echo '</li>';
     echo "</ul></nav>\n";
+
     yourls_do_action( 'admin_notices' );
     yourls_do_action( 'admin_notice' ); // because I never remember if it's 'notices' or 'notice'
     /*
