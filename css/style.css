@@ -96,13 +96,15 @@ main,
     gap: 2px;
 }
 
-.brand_copy strong,
-h1,
-h2,
-h3 {
+.brand_copy strong {
     font-family: "Teko", sans-serif;
     letter-spacing: 0.04em;
     margin: 0;
+}
+
+.section_heading h2,
+#login h2 {
+    margin: 10px 0 12px;
 }
 
 .brand_copy strong {
@@ -284,7 +286,6 @@ main {
 #login h2 {
     font-size: clamp(2.1rem, 5vw, 3.6rem);
     line-height: 0.95;
-    margin: 10px 0 12px;
 }
 
 .dashboard_intro_copy p,
@@ -432,9 +433,22 @@ input.disabled,
     padding: 24px;
 }
 
-.links_search_state {
-    margin: 0 0 14px;
-    color: var(--gk-text-soft);
+.links_search_toolbar {
+    display: grid;
+    gap: 10px;
+    margin: 0 0 18px;
+}
+
+.links_search_toolbar label {
+    font-weight: 600;
+}
+
+.links_search_toolbar input[type="search"] {
+    width: 100%;
+}
+
+.links_search_toolbar button {
+    display: none;
 }
 
 .section_heading {
@@ -499,9 +513,10 @@ td.keyword a {
 }
 
 td.clicks .click_count {
-    font-family: "Teko", sans-serif;
-    font-size: 2rem;
-    line-height: 1;
+    font-family: "Baloo 2", sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.1;
 }
 
 td.actions .action_stack {
@@ -687,9 +702,9 @@ a.bookmarklet:hover {
 
 #delete-confirm-dialog > div[name="dialog_title"] {
     padding: 18px 22px;
-    font-family: "Teko", sans-serif;
-    font-size: 2rem;
-    line-height: 1;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.1;
     color: var(--gk-text);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }

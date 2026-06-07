@@ -22,6 +22,15 @@ $(document).ready(function(){
 		split_search_text_before_search();
 		return true;
 	});
+
+	var liveSearchTimer = null;
+	$('#links-search-input').on('input search', function() {
+		var form = $('#links-search-form');
+		clearTimeout(liveSearchTimer);
+		liveSearchTimer = setTimeout(function() {
+			form.trigger('submit');
+		}, 250);
+	});
 });
 
 // Create new link and add to table

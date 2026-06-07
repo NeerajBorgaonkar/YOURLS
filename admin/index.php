@@ -240,8 +240,13 @@ if ( !$is_bookmark ) {
 
 yourls_do_action( 'admin_page_before_table' );
 
-if ( !$is_bookmark && $search_sentence ) {
-    echo '<p class="links_search_state">' . $search_sentence . '</p>';
+if ( !$is_bookmark ) {
+    echo '<form id="links-search-form" class="links_search_toolbar" action="" method="get">';
+    echo '<label for="links-search-input">' . yourls__( 'Search for' ) . '</label>';
+    echo '<input type="search" id="links-search-input" name="search" class="text" value="' . yourls_esc_attr( $search_text ) . '" placeholder="' . yourls_esc_attr__( 'Search links' ) . '" autocomplete="off" />';
+    echo '<input type="hidden" name="search_in" value="all" />';
+    echo '<button type="submit" class="button primary">' . yourls__( 'Search' ) . '</button>';
+    echo '</form>';
 }
 
 yourls_table_head();
