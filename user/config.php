@@ -90,5 +90,9 @@ define( 'GK_LINKS_TAGLINE', gk_links_env( 'GK_LINKS_TAGLINE', 'Your private shor
 define( 'GK_LINKS_LOGO_URL', gk_links_env( 'GK_LINKS_LOGO_URL', '' ) );
 define( 'GK_LINKS_FOOTER_HTML', gk_links_env( 'GK_LINKS_FOOTER_HTML', 'Powered by <a href="https://github.com/NeerajBorgaonkar/YOURLS" title="GK Links source">GK Links</a>' ) );
 
+$yourls_user_passwords = [
+    $yourls_user => $yourls_password,
+];
+
 define( 'YOURLS_USER', $yourls_user );
 putenv( 'YOURLS_PASSWORD=' . $yourls_password );
