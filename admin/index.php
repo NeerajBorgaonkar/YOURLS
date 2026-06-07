@@ -23,7 +23,7 @@ $view_params = new YOURLS\Views\AdminParams();
 
 // Pagination
 $page    = $view_params->get_page();
-$perpage = $view_params->get_per_page(15);
+$perpage = $view_params->get_per_page(10);
 
 // Searching
 $search         = $view_params->get_search();
@@ -199,7 +199,7 @@ if ( isset( $_GET['u'] ) or isset( $_GET['up'] ) ) {
         $offset = 0;
     }
     if( empty($perpage) || $perpage == 0) {
-        $perpage = 50;
+        $perpage = 10;
     }
 
     $offset = ( $page-1 ) * $perpage;
@@ -241,17 +241,6 @@ if ( !$is_bookmark ) {
 yourls_do_action( 'admin_page_before_table' );
 
 if ( !$is_bookmark ) {
-    echo '<form id="links-search-form" class="links_search_toolbar" action="" method="get">';
-    echo '<label for="links-search-input">' . yourls__( 'Search for' ) . '</label>';
-    echo '<input type="search" id="links-search-input" name="search" class="text" value="' . yourls_esc_attr( $search_text ) . '" placeholder="' . yourls_esc_attr__( 'Search links' ) . '" autocomplete="off" />';
-    echo '<input type="hidden" name="search_in" value="all" />';
-    echo '<button type="submit" class="button primary">' . yourls__( 'Search' ) . '</button>';
-    echo '</form>';
-}
-
-yourls_table_head();
-
-if ( !$is_bookmark ) {
     $params = array(
         'search'       => $search,
         'search_text'  => $search_text,
@@ -267,6 +256,32 @@ if ( !$is_bookmark ) {
         'date_first'   => $date_first,
         'date_second'  => $date_second,
     );
+
+    echo '<form id="links-search-form" class="links_search_toolbar" action="" method="get">';
+    echo '<div class="links_search_main">';
+    echo '<label for="links-search-input">' . yourls__( 'Search for' ) . '</label>';
+    echo '<input type="search" id="links-search-input" name="search" class="text" value="' . yourls_esc_attr( $search_text ) . '" placeholder="' . yourls_esc_attr__( 'Search links' ) . '" autocomplete="off" />';
+    echo '</div>';
+    echo '<div class="links_search_meta">';
+    echo '<label for="links-per-page">' . yourls__( 'Show' ) . '</label>';
+    echo '<select id="links-per-page" name="perpage">';
+    foreach ( array( 10, 20, 50, 100, 500 ) as $count_option ) {
+        $selected = ( (int) $perpage === $count_option ) ? ' selected="selected"' : '';
+        echo '<option value="' . $count_option . '"' . $selected . '>' . $count_option . '</option>';
+    }
+    echo '</select>';
+    echo '<span class="links_search_suffix">' . yourls__( 'records' ) . '</span>';
+    echo '</div>';
+    echo '<input type="hidden" name="search_in" value="all" />';
+    echo '<input type="hidden" name="sort_by" value="' . yourls_esc_attr( $sort_by ) . '" />';
+    echo '<input type="hidden" name="sort_order" value="' . yourls_esc_attr( $sort_order ) . '" />';
+    echo '<button type="submit" class="button primary">' . yourls__( 'Search' ) . '</button>';
+    echo '</form>';
+}
+
+yourls_table_head( $params ?? array() );
+
+if ( !$is_bookmark ) {
     yourls_html_tfooter( $params );
 }
 

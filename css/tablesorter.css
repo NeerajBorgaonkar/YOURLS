@@ -20,29 +20,33 @@ table.tblSorter th.header {
     background: transparent;
 }
 
-table.tblSorter thead tr .tablesorter-header {
-    background-image: url('../images/bg.svg');
-    background-repeat: no-repeat;
-    background-position: center right;
-    cursor: pointer;
-    padding-right: 26px;
+table.tblSorter thead tr th.sortable a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
 }
 
-table.tblSorter thead tr .sorter-false {
-    background-image: none;
-    cursor: default;
+table.tblSorter thead tr th.sortable a::after {
+    content: "↕";
+    color: #6f6f6f;
+    font-size: 0.8rem;
 }
 
-table.tblSorter thead tr .tablesorter-headerDesc {
-    background-image: url('../images/desc.svg');
+table.tblSorter thead tr th.current-sort a::after {
+    color: #FFD600;
 }
 
-table.tblSorter thead tr .tablesorter-headerAsc {
-    background-image: url('../images/asc.svg');
+table.tblSorter thead tr th.sort-asc a::after {
+    content: "↑";
 }
 
-table.tblSorter thead tr .tablesorter-headerAsc,
-table.tblSorter thead tr .tablesorter-headerDesc {
+table.tblSorter thead tr th.sort-desc a::after {
+    content: "↓";
+}
+
+table.tblSorter thead tr th.current-sort a,
+table.tblSorter thead tr th.current-sort span {
     color: #FFFFFF;
 }
 
@@ -85,44 +89,6 @@ table.tblSorter tbody tr:focus-within td {
 
 table.tblSorter tfoot tr {
     background: transparent;
-}
-
-#filter_form {
-    text-align: left;
-    max-width: none;
-}
-
-#filter_form form {
-    display: grid;
-    gap: 18px;
-}
-
-#filter_options {
-    display: grid;
-    gap: 12px;
-    padding: 22px;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: #BDBDBD;
-}
-
-#filter_options br {
-    display: none;
-}
-
-#filter_form input.text,
-#filter_form select {
-    width: auto;
-    min-width: 84px;
-    margin: 0 4px;
-}
-
-#filter_buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-start;
-    float: none;
 }
 
 #pagination {
@@ -215,16 +181,6 @@ table.tblSorter tfoot tr {
         border-bottom-left-radius: 18px;
         border-bottom-right-radius: 18px;
         border-top-right-radius: 0;
-    }
-
-    #filter_options {
-        padding: 18px;
-    }
-
-    #filter_form input.text,
-    #filter_form select {
-        width: 100%;
-        margin: 6px 0 0;
     }
 
     .navigation {

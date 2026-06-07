@@ -79,6 +79,8 @@ class AdminParams
      */
     public function get_per_page(int $default): int
     {
+        $allowed_values = [10, 20, 50, 100, 500];
+
         // return if we have a value and it's not 0
         if (isset($_GET['perpage']) && intval($_GET['perpage'])) {
             $per_page = intval($_GET['perpage']);
@@ -88,7 +90,7 @@ class AdminParams
             $per_page = yourls_apply_filter('admin_view_per_page', $default);
         }
 
-        return $per_page;
+        return in_array($per_page, $allowed_values, true) ? $per_page : $default;
     }
 
     /**

@@ -188,6 +188,12 @@ ul#admin_menu > li > a:focus {
     color: var(--gk-text);
 }
 
+.admin_menu_back a {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--gk-text);
+}
+
 .hamburger_menu {
     position: relative;
     z-index: 51;
@@ -435,8 +441,16 @@ input.disabled,
 
 .links_search_toolbar {
     display: grid;
-    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: end;
     margin: 0 0 18px;
+}
+
+.links_search_main,
+.links_search_meta {
+    display: grid;
+    gap: 8px;
 }
 
 .links_search_toolbar label {
@@ -445,6 +459,16 @@ input.disabled,
 
 .links_search_toolbar input[type="search"] {
     width: 100%;
+}
+
+.links_search_meta {
+    grid-template-columns: auto minmax(88px, 110px) auto;
+    align-items: center;
+}
+
+.links_search_meta label,
+.links_search_suffix {
+    white-space: nowrap;
 }
 
 .links_search_toolbar button {
@@ -501,15 +525,46 @@ td.timestamp span.timestamp {
     margin-top: 8px;
 }
 
+.destination_details {
+    display: grid;
+    gap: 8px;
+}
+
+.destination_summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--gk-text);
+}
+
+.destination_summary::-webkit-details-marker {
+    display: none;
+}
+
+.destination_summary::after {
+    content: "Show URL";
+    display: inline-flex;
+    margin-left: 10px;
+    color: var(--gk-accent);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.destination_details[open] .destination_summary::after {
+    content: "Hide URL";
+}
+
 .destination_meta small,
 td.url small,
 .meta_ip {
     color: var(--gk-text-soft);
 }
 
+.copy_short_url,
 td.keyword a {
     font-weight: 700;
     color: var(--gk-accent);
+    word-break: break-all;
 }
 
 td.clicks .click_count {
@@ -752,6 +807,10 @@ a.bookmarklet:hover {
         grid-template-columns: 1fr;
     }
 
+    .links_search_toolbar {
+        grid-template-columns: 1fr;
+    }
+
     #top_navigation {
         align-items: center;
     }
@@ -806,6 +865,11 @@ a.bookmarklet:hover {
 
     .admin_menu_primary {
         flex: 1 1 auto;
+    }
+
+    .links_search_meta {
+        grid-template-columns: 1fr;
+        align-items: stretch;
     }
 
     .cell_label {

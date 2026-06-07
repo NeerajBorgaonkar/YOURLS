@@ -600,22 +600,24 @@ function yourls_table_add_row( string $keyword, string $url, string $title, stri
 
     // Row cells: the array
     $cells = array(
-        'keyword' => array(
-            'template'      => '<span class="cell_label">%label%</span><a href="%shorturl%">%keyword_html%</a>',
-            'label'         => yourls__( 'Short URL' ),
-            'shorturl'      => yourls_esc_url( $shorturl ),
-            'keyword_html'  => yourls_esc_html( $keyword ),
-        ),
         'url' => array(
-            'template'      => '<span class="cell_label">%label%</span><a href="%long_url%" title="%title_attr%">%title_html%</a><div class="destination_meta"><small>%warning%<a href="%long_url%">%long_url_html%</a></small><small class="meta_ip">%ip_label%: %ip%</small></div>',
-            'label'         => yourls__( 'Destination URL' ),
+            'template'      => '<span class="cell_label">%label%</span><details class="destination_details"><summary class="destination_summary" title="%title_attr%">%title_html%</summary><div class="destination_meta"><small>%warning%<a href="%long_url%">%long_url_html%</a></small><small class="meta_ip">%ip_label%: %ip%</small></div></details>',
+            'label'         => yourls__( 'Title' ),
             'long_url'      => yourls_esc_url( $url ),
             'title_attr'    => yourls_esc_attr( $title ),
             'title_html'    => yourls_esc_html( yourls_trim_long_string( $title ) ),
-            'long_url_html' => yourls_esc_html( yourls_trim_long_string( urldecode( $url ) ) ),
+            'long_url_html' => yourls_esc_html( urldecode( $url ) ),
             'warning'       => $protocol_warning,
-            'ip'       => yourls_sanitize_ip($ip),
-            'ip_label' => yourls__( 'Created by IP' ),
+            'ip'            => yourls_sanitize_ip($ip),
+            'ip_label'      => yourls__( 'Created by IP' ),
+        ),
+        'keyword' => array(
+            'template'      => '<span class="cell_label">%label%</span><a href="%shorturl%" class="copy_short_url" title="%copy_title%" onclick="copy_row_shorturl(\'%id%\');return false;">%shorturl_html%</a>',
+            'label'         => yourls__( 'Short URL' ),
+            'shorturl'      => yourls_esc_url( $shorturl ),
+            'shorturl_html' => yourls_esc_html( $shorturl ),
+            'copy_title'    => yourls_esc_attr__( 'Copy short URL' ),
+            'id'            => $id,
         ),
         'clicks' => array(
             'template' => '<span class="cell_label">%label%</span><span class="click_count">%clicks%</span>',
@@ -656,19 +658,46 @@ function yourls_table_add_row( string $keyword, string $url, string $title, stri
  *
  * @return void
  */
-function yourls_table_head() {
+function yourls_table_head( array $params = array() ) {
     $start = '<table id="main_table" class="tblSorter" cellpadding="0" cellspacing="1"><thead><tr>'."\n";
     echo yourls_apply_filter( 'table_head_start', $start );
 
+    $current_sort_by = $params['sort_by'] ?? 'timestamp';
+    $current_sort_order = $params['sort_order'] ?? 'desc';
+    $base_page = yourls_admin_url( 'index.php' );
+    $persisted = array_filter(
+        array(
+            'search'    => $params['search_text'] ?? '',
+            'search_in' => $params['search_in'] ?? 'all',
+            'perpage'   => $params['perpage'] ?? 10,
+        ),
+        function( $value ) {
+            return $value !== '';
+        }
+    );
+
     $cells = yourls_apply_filter( 'table_head_cells', array(
-        'shorturl' => yourls__( 'Short URL' ),
-        'longurl'  => yourls__( 'Destination URL' ),
-        'clicks'   => yourls__( 'Clicks' ),
-        'date'     => yourls__( 'Created Date' ),
-        'actions'  => yourls__( 'Actions' )
+        'longurl'  => array( 'label' => yourls__( 'Title' ), 'sort_by' => 'title' ),
+        'shorturl' => array( 'label' => yourls__( 'Short URL' ), 'sort_by' => 'keyword' ),
+        'clicks'   => array( 'label' => yourls__( 'Clicks' ), 'sort_by' => 'clicks' ),
+        'date'     => array( 'label' => yourls__( 'Created Date' ), 'sort_by' => 'timestamp' ),
+        'actions'  => array( 'label' => yourls__( 'Actions' ) )
     ) );
-    foreach( $cells as $k => $v ) {
-        echo "<th id='main_table_head_$k'><span>$v</span></th>\n";
+    foreach( $cells as $k => $cell ) {
+        $label = is_array( $cell ) ? $cell['label'] : $cell;
+        $sort_key = is_array( $cell ) && isset( $cell['sort_by'] ) ? $cell['sort_by'] : '';
+
+        if ( $sort_key ) {
+            $next_order = ( $current_sort_by === $sort_key && $current_sort_order === 'asc' ) ? 'desc' : 'asc';
+            $sort_class = $current_sort_by === $sort_key ? ' current-sort sort-' . $current_sort_order : '';
+            $sort_url = yourls_add_query_arg(
+                array_merge( $persisted, array( 'sort_by' => $sort_key, 'sort_order' => $next_order ) ),
+                $base_page
+            );
+            echo "<th id='main_table_head_$k' class='sortable$sort_class'><a href='" . yourls_esc_url( $sort_url ) . "'><span>" . yourls_esc_html( $label ) . "</span></a></th>\n";
+        } else {
+            echo "<th id='main_table_head_$k' class='sorter-false'><span>" . yourls_esc_html( $label ) . "</span></th>\n";
+        }
     }
 
     $end = "</tr></thead>\n";
@@ -825,7 +854,16 @@ function yourls_html_menu() {
         }
     }
 
+    $context = yourls_get_html_context();
+
     echo '<nav id="top_navigation" role="navigation"><ul id="admin_menu">'."\n";
+    if ( ! in_array( $context, array( 'index', 'bookmark', 'login', 'install' ), true ) ) {
+        printf(
+            '<li id="admin_menu_back_link" class="admin_menu_toplevel admin_menu_back"><a href="%s">%s</a></li>',
+            yourls_admin_url( 'index.php' ) . '#links-table-section',
+            yourls__( 'Back to Links' )
+        );
+    }
     foreach( $primary_links as $link => $ar ) {
         $title = isset( $ar['title'] ) ? 'title="' . $ar['title'] . '"' : '';
         printf( '<li id="admin_menu_%s_link" class="admin_menu_toplevel admin_menu_primary"><a href="%s" %s>%s</a></li>', $link, $ar['url'], $title, $ar['anchor'] );
