@@ -105,6 +105,26 @@ if ( !empty($where['sql']) ) {
     $total_items_clicks = false;
 }
 
+$today_clicks = 0;
+if ( yourls_do_log_redirect() ) {
+    $offset = yourls_get_time_offset();
+    $table_log = YOURLS_DB_TABLE_LOG;
+    $today_clicks = (int) yourls_get_db('read-admin_today_clicks')->fetchValue(
+        "SELECT COUNT(*) FROM `$table_log` WHERE DATE(DATE_ADD(`click_time`, INTERVAL $offset HOUR)) = DATE(DATE_ADD(CURRENT_TIMESTAMP, INTERVAL $offset HOUR))"
+    );
+}
+
+$top_link = yourls_get_db('read-admin_top_link')->fetchObject(
+    "SELECT `keyword`, `url`, `title`, `clicks` FROM `$table_url` ORDER BY `clicks` DESC, `timestamp` DESC LIMIT 1"
+);
+$top_link_keyword = $top_link ? yourls_sanitize_keyword( $top_link->keyword ) : '';
+$top_link_shorturl = $top_link_keyword ? yourls_link( $top_link_keyword ) : '';
+$top_link_title = '';
+if ( $top_link ) {
+    $top_link_title = $top_link->title ? $top_link->title : $top_link->url;
+}
+$top_link_clicks = $top_link ? (int) $top_link->clicks : 0;
+
 // This is a bookmarklet
 if ( isset( $_GET['u'] ) or isset( $_GET['up'] ) ) {
     $is_bookmark = true;
@@ -244,20 +264,58 @@ yourls_html_menu() ;
 yourls_do_action( 'admin_page_before_content' );
 
 if ( !$is_bookmark ) { ?>
-    <p><?php echo $search_sentence; ?></p>
-    <p><?php
-        if ( $total_items === 0 ) {
-            printf( yourls__( 'No URLs.' ) );
-            if ( ! empty( $search ) )
-                printf( ' ' . yourls__( 'Try being less specific' ) );
-        } else {
-            printf( yourls__( 'Display <strong>%1$s</strong> to <strong class="increment">%2$s</strong> of <strong class="increment">%3$s</strong> URLs' ), $display_on_page, $max_on_page, $total_items );
-            if( $total_items_clicks !== false )
-                echo ", " . sprintf( yourls_n( 'counting <strong>1</strong> click', 'counting <strong>%s</strong> clicks', $total_items_clicks ), yourls_number_format_i18n( $total_items_clicks ) );
-        }
-    ?>.</p>
+    <section class="dashboard_intro">
+        <div class="dashboard_intro_copy">
+            <span class="eyebrow"><?php yourls_e( 'GK Links Dashboard' ); ?></span>
+            <h2><?php yourls_e( 'Modern link management with full YOURLS power underneath.' ); ?></h2>
+            <p><?php
+                if ( $total_items === 0 ) {
+                    printf( yourls__( 'No URLs.' ) );
+                    if ( ! empty( $search ) ) {
+                        printf( ' ' . yourls__( 'Try being less specific' ) );
+                    }
+                } else {
+                    printf( yourls__( 'Display <strong>%1$s</strong> to <strong class="increment">%2$s</strong> of <strong class="increment">%3$s</strong> URLs' ), $display_on_page, $max_on_page, $total_items );
+                    if( $total_items_clicks !== false ) {
+                        echo ', ' . sprintf( yourls_n( 'counting <strong>1</strong> click', 'counting <strong>%s</strong> clicks', $total_items_clicks ), yourls_number_format_i18n( $total_items_clicks ) );
+                    }
+                    echo '.';
+                }
+            ?></p>
+            <?php if ( $search_sentence ) { ?>
+                <p class="dashboard_search_sentence"><?php echo $search_sentence; ?></p>
+            <?php } ?>
+        </div>
+        <div class="dashboard_stat_grid">
+            <article class="stat_card">
+                <span class="stat_label"><?php yourls_e( 'Total Links' ); ?></span>
+                <strong class="stat_value increment"><?php echo yourls_number_format_i18n( $total_urls ); ?></strong>
+                <small><?php yourls_e( 'All active short links in the workspace.' ); ?></small>
+            </article>
+            <article class="stat_card">
+                <span class="stat_label"><?php yourls_e( 'Total Clicks' ); ?></span>
+                <strong id="dashboard-total-clicks" class="stat_value"><?php echo yourls_number_format_i18n( $total_clicks ); ?></strong>
+                <small><?php yourls_e( 'Cumulative tracked visits across all links.' ); ?></small>
+            </article>
+            <article class="stat_card">
+                <span class="stat_label"><?php yourls_e( 'Today\'s Clicks' ); ?></span>
+                <strong class="stat_value"><?php echo yourls_number_format_i18n( $today_clicks ); ?></strong>
+                <small><?php yourls_e( 'Clicks recorded during the current day.' ); ?></small>
+            </article>
+            <article class="stat_card stat_card_top_link">
+                <span class="stat_label"><?php yourls_e( 'Top Link' ); ?></span>
+                <?php if ( $top_link_shorturl ) { ?>
+                    <strong class="stat_value"><a href="<?php echo yourls_esc_url( $top_link_shorturl ); ?>"><?php echo yourls_esc_html( yourls_trim_long_string( $top_link_title, 28 ) ); ?></a></strong>
+                    <small><?php echo yourls_number_format_i18n( $top_link_clicks ); ?> <?php yourls_e( 'clicks' ); ?> · <a href="<?php echo yourls_esc_url( yourls_statlink( $top_link_keyword ) ); ?>"><?php yourls_e( 'View stats' ); ?></a></small>
+                <?php } else { ?>
+                    <strong class="stat_value"><?php yourls_e( 'No data yet' ); ?></strong>
+                    <small><?php yourls_e( 'Create your first short link to populate insights.' ); ?></small>
+                <?php } ?>
+            </article>
+        </div>
+    </section>
+    <p id="overall_tracking"><?php printf( yourls__( 'Overall, tracking <strong class="increment">%1$s</strong> links, <strong>%2$s</strong> clicks, and counting!' ), yourls_number_format_i18n( $total_urls ), yourls_number_format_i18n( $total_clicks ) ); ?></p>
 <?php } ?>
-<p id="overall_tracking"><?php printf( yourls__( 'Overall, tracking <strong class="increment">%1$s</strong> links, <strong>%2$s</strong> clicks, and counting!' ), yourls_number_format_i18n( $total_urls ), yourls_number_format_i18n( $total_clicks ) ); ?></p>
 <?php
 
 yourls_do_action( 'admin_page_before_form' );
@@ -275,6 +333,16 @@ if ( !$is_bookmark ) {
 }
 
 yourls_do_action( 'admin_page_before_table' );
+
+if ( !$is_bookmark ) { ?>
+    <section id="links-table-section" class="links_section_heading">
+        <div class="section_heading">
+            <span class="eyebrow"><?php yourls_e( 'Links Area' ); ?></span>
+            <h2><?php yourls_e( 'Manage short links' ); ?></h2>
+            <p><?php yourls_e( 'Review performance, copy URLs, edit destinations, and remove links without leaving the dashboard.' ); ?></p>
+        </div>
+    </section>
+<?php }
 
 yourls_table_head();
 
@@ -318,7 +386,7 @@ if( $url_results ) {
 }
 
 $display = $found_rows ? 'display:none' : '';
-echo '<tr id="nourl_found" style="'.$display.'"><td colspan="6">' . yourls__('No URL') . '</td></tr>';
+echo '<tr id="nourl_found" style="'.$display.'"><td colspan="5">' . yourls__('No URL') . '</td></tr>';
 
 yourls_table_tbody_end();
 

@@ -11,13 +11,16 @@ function yourls_html_logo() {
     $brand_tagline = defined( 'GK_LINKS_TAGLINE' ) && GK_LINKS_TAGLINE ? GK_LINKS_TAGLINE : 'Your Own URL Shortener';
     $logo_url = defined( 'GK_LINKS_LOGO_URL' ) && GK_LINKS_LOGO_URL ? GK_LINKS_LOGO_URL : yourls_site_url( false ) . '/images/yourls-logo.svg';
     ?>
-    <header role="banner">
-    <h1>
-        <a href="<?php echo yourls_admin_url( 'index.php' ) ?>" title="<?php echo yourls_esc_attr( $brand_name ); ?>">
-            <span><?php echo yourls_esc_html( $brand_name ); ?></span>: <span><?php echo yourls_esc_html( $brand_tagline ); ?></span><br/>
-            <img src="<?php echo yourls_esc_attr( $logo_url ); ?>" id="yourls-logo" alt="<?php echo yourls_esc_attr( $brand_name ); ?>" title="<?php echo yourls_esc_attr( $brand_name ); ?>" />
+    <header id="app_header" role="banner">
+        <a class="brand_lockup" href="<?php echo yourls_admin_url( 'index.php' ) ?>" title="<?php echo yourls_esc_attr( $brand_name ); ?>">
+            <span class="brand_mark">
+                <img src="<?php echo yourls_esc_attr( $logo_url ); ?>" id="yourls-logo" alt="<?php echo yourls_esc_attr( $brand_name ); ?>" title="<?php echo yourls_esc_attr( $brand_name ); ?>" />
+            </span>
+            <span class="brand_copy">
+                <strong><?php echo yourls_esc_html( $brand_name ); ?></strong>
+                <small><?php echo yourls_esc_html( $brand_tagline ); ?></small>
+            </span>
         </a>
-    </h1>
     </header>
     <?php
     yourls_do_action( 'html_logo' );
@@ -97,8 +100,12 @@ function yourls_html_head( $context = 'index', $title = '' ) {
     <meta http-equiv="Content-Type" content="<?php echo yourls_apply_filter( 'html_head_meta_content-type', 'text/html; charset=utf-8' ); ?>" />
     <meta name="generator" content="<?php echo yourls_esc_attr( $brand_name ); ?> <?php echo YOURLS_VERSION ?>" />
     <meta name="description" content="<?php echo yourls_esc_attr( $brand_name . ' - ' . $brand_tagline ); ?> | <?php yourls_site_url(); ?>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <?php yourls_do_action('html_head_meta', $context); ?>
     <?php yourls_html_favicon(); ?>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="<?php yourls_site_url(); ?>/js/jquery-3.5.1.min.js?v=<?php echo YOURLS_VERSION; ?>" type="text/javascript"></script>
     <script src="<?php yourls_site_url(); ?>/js/common.js?v=<?php echo YOURLS_VERSION; ?>" type="text/javascript"></script>
     <script src="<?php yourls_site_url(); ?>/js/jquery.notifybar.js?v=<?php echo YOURLS_VERSION; ?>" type="text/javascript"></script>
@@ -199,15 +206,26 @@ function yourls_html_addnew( string $url = '', string $keyword = '' ) {
     ?>
     <main role="main">
     <div id="new_url">
-        <div>
+        <div class="quick-create-shell">
+            <div class="section_heading">
+                <span class="eyebrow"><?php yourls_e( 'Quick Create' ); ?></span>
+                <h2><?php yourls_e( 'Create a new short link' ); ?></h2>
+                <p><?php yourls_e( 'Shorten a destination instantly with an optional branded slug.' ); ?></p>
+            </div>
             <form id="new_url_form" action="" method="get">
-                <div>
-                    <label for="add-url"><strong><?php yourls_e( 'Enter the URL' ); ?></strong></label>:
-                    <input type="text" id="add-url" name="url" value="<?php echo yourls_esc_attr($url); ?>" class="text" size="80" placeholder="https://" />
-                    <label for="add-keyword"><?php yourls_e( 'Optional '); ?> : <strong><?php yourls_e('Custom short URL'); ?></strong></label>:
-                    <input type="text" id="add-keyword" name="keyword" value="<?php echo yourls_esc_attr($keyword); ?>" class="text" size="8" />
-                    <?php yourls_nonce_field( 'add_url', 'nonce-add' ); ?>
-                    <input type="button" id="add-button" name="add-button" value="<?php yourls_e( 'Shorten The URL' ); ?>" class="button" onclick="add_link();" />
+                <div class="quick-create-grid">
+                    <div class="form_field field_url">
+                        <label for="add-url"><?php yourls_e( 'Long URL' ); ?></label>
+                        <input type="text" id="add-url" name="url" value="<?php echo yourls_esc_attr($url); ?>" class="text" size="80" placeholder="https://example.com/campaign" />
+                    </div>
+                    <div class="form_field field_keyword">
+                        <label for="add-keyword"><?php yourls_e('Custom Slug'); ?></label>
+                        <input type="text" id="add-keyword" name="keyword" value="<?php echo yourls_esc_attr($keyword); ?>" class="text" size="8" placeholder="optional" />
+                    </div>
+                    <div class="form_actions">
+                        <?php yourls_nonce_field( 'add_url', 'nonce-add' ); ?>
+                        <input type="button" id="add-button" name="add-button" value="<?php yourls_e( 'Create Short Link' ); ?>" class="button primary" onclick="add_link();" />
+                    </div>
                 </div>
             </form>
             <div id="feedback" style="display:none"></div>
@@ -273,7 +291,7 @@ function yourls_html_tfooter( array $params = [] ):void {
     ?>
     <tfoot>
         <tr>
-            <th colspan="6">
+            <th colspan="5">
             <div id="filter_form">
                 <form action="" method="get">
                     <div id="filter_options">
@@ -572,11 +590,11 @@ function yourls_table_edit_row( $keyword, $id ) {
 
     if( $url ) {
         $return = <<<RETURN
-<tr id="edit-$id" class="edit-row"><td colspan="5" class="edit-row"><strong>%s</strong>:<input type="text" id="edit-url-$id" name="edit-url-$id" value="$safe_url" class="text" size="70" /><br/><strong>%s</strong>: $www<input type="text" id="edit-keyword-$id" name="edit-keyword-$id" value="$safe_keyword" class="text" size="10" /><br/><strong>%s</strong>: <input type="text" id="edit-title-$id" name="edit-title-$id" value="$safe_title" class="text" size="60" /></td><td colspan="1"><input type="button" id="edit-submit-$id" name="edit-submit-$id" value="%s" title="%s" class="button" onclick="edit_link_save('$id');" />&nbsp;<input type="button" id="edit-close-$id" name="edit-close-$id" value="%s" title="%s" class="button" onclick="edit_link_hide('$id');" /><input type="hidden" id="old_keyword_$id" value="$safe_keyword"/><input type="hidden" id="nonce_$id" value="$nonce"/></td></tr>
+<tr id="edit-$id" class="edit-row"><td colspan="4" class="edit-row"><strong>%s</strong>:<input type="text" id="edit-url-$id" name="edit-url-$id" value="$safe_url" class="text" size="70" /><br/><strong>%s</strong>: $www<input type="text" id="edit-keyword-$id" name="edit-keyword-$id" value="$safe_keyword" class="text" size="10" /><br/><strong>%s</strong>: <input type="text" id="edit-title-$id" name="edit-title-$id" value="$safe_title" class="text" size="60" /></td><td colspan="1"><input type="button" id="edit-submit-$id" name="edit-submit-$id" value="%s" title="%s" class="button" onclick="edit_link_save('$id');" />&nbsp;<input type="button" id="edit-close-$id" name="edit-close-$id" value="%s" title="%s" class="button" onclick="edit_link_hide('$id');" /><input type="hidden" id="old_keyword_$id" value="$safe_keyword"/><input type="hidden" id="nonce_$id" value="$nonce"/></td></tr>
 RETURN;
         $return = sprintf( $return, yourls__( 'Long URL' ), yourls__( 'Short URL' ), yourls__( 'Title' ), yourls__( 'Save' ), yourls__( 'Save new values' ), yourls__( 'Cancel' ), yourls__( 'Cancel editing' ) );
     } else {
-        $return = '<tr class="edit-row notfound"><td colspan="6" class="edit-row notfound">' . yourls__( 'Error, URL not found' ) . '</td></tr>';
+        $return = '<tr class="edit-row notfound"><td colspan="5" class="edit-row notfound">' . yourls__( 'Error, URL not found' ) . '</td></tr>';
     }
 
     $return = yourls_apply_filter( 'table_edit_row', $return, $keyword, $url, $title );
@@ -613,18 +631,18 @@ function yourls_table_add_row( string $keyword, string $url, string $title, stri
 
     // Action link buttons: the array
     $actions = array(
+        'copy' => array(
+            'href'    => $shorturl,
+            'id'      => "copy-button-$id",
+            'title'   => yourls_esc_attr__( 'Copy short URL' ),
+            'anchor'  => yourls__( 'Copy' ),
+            'onclick' => "copy_row_shorturl('$id');return false;",
+        ),
         'stats' => array(
             'href'    => $statlink,
             'id'      => "statlink-$id",
-            'title'   => yourls_esc_attr__( 'Stats' ),
-            'anchor'  => yourls__( 'Stats' ),
-        ),
-        'share' => array(
-            'href'    => '',
-            'id'      => "share-button-$id",
-            'title'   => yourls_esc_attr__( 'Share' ),
-            'anchor'  => yourls__( 'Share' ),
-            'onclick' => "toggle_share('$id');return false;",
+            'title'   => yourls_esc_attr__( 'View stats' ),
+            'anchor'  => yourls__( 'View Stats' ),
         ),
         'edit' => array(
             'href'    => $edit_link,
@@ -663,33 +681,36 @@ function yourls_table_add_row( string $keyword, string $url, string $title, stri
     // Row cells: the array
     $cells = array(
         'keyword' => array(
-            'template'      => '<a href="%shorturl%">%keyword_html%</a>',
+            'template'      => '<span class="cell_label">%label%</span><a href="%shorturl%">%keyword_html%</a>',
+            'label'         => yourls__( 'Short URL' ),
             'shorturl'      => yourls_esc_url( $shorturl ),
             'keyword_html'  => yourls_esc_html( $keyword ),
         ),
         'url' => array(
-            'template'      => '<a href="%long_url%" title="%title_attr%">%title_html%</a><br/><small>%warning%<a href="%long_url%">%long_url_html%</a></small>',
+            'template'      => '<span class="cell_label">%label%</span><a href="%long_url%" title="%title_attr%">%title_html%</a><div class="destination_meta"><small>%warning%<a href="%long_url%">%long_url_html%</a></small><small class="meta_ip">%ip_label%: %ip%</small></div>',
+            'label'         => yourls__( 'Destination URL' ),
             'long_url'      => yourls_esc_url( $url ),
             'title_attr'    => yourls_esc_attr( $title ),
             'title_html'    => yourls_esc_html( yourls_trim_long_string( $title ) ),
             'long_url_html' => yourls_esc_html( yourls_trim_long_string( urldecode( $url ) ) ),
             'warning'       => $protocol_warning,
-        ),
-        'timestamp' => array(
-            'template' => '<span class="timestamp" aria-hidden="true">%timestamp%</span> %date%',
-            'timestamp' => $timestamp,
-            'date'     => yourls_date_i18n( yourls_get_datetime_format(yourls__('M d, Y H:i')), yourls_get_timestamp( $timestamp )),
-        ),
-        'ip' => array(
-            'template' => '%ip%',
             'ip'       => yourls_sanitize_ip($ip),
+            'ip_label' => yourls__( 'Created by IP' ),
         ),
         'clicks' => array(
-            'template' => '%clicks%',
+            'template' => '<span class="cell_label">%label%</span><span class="click_count">%clicks%</span>',
+            'label'    => yourls__( 'Clicks' ),
             'clicks'   => yourls_number_format_i18n( $clicks, 0 ),
         ),
+        'timestamp' => array(
+            'template' => '<span class="cell_label">%label%</span><span class="timestamp" aria-hidden="true">%timestamp%</span><span class="date_value">%date%</span>',
+            'label'     => yourls__( 'Created Date' ),
+            'timestamp' => $timestamp,
+            'date'      => yourls_date_i18n( yourls_get_datetime_format(yourls__('M d, Y H:i')), yourls_get_timestamp( $timestamp )),
+        ),
         'actions' => array(
-            'template' => '%actions% <input type="hidden" id="keyword_%id%" value="%keyword%"/>',
+            'template' => '<span class="cell_label">%label%</span><div class="action_stack">%actions%</div><input type="hidden" id="keyword_%id%" value="%keyword%"/>',
+            'label'    => yourls__( 'Actions' ),
             'actions'  => $action_links,
             'id'       => $id,
             'keyword'  => $keyword,
@@ -700,7 +721,7 @@ function yourls_table_add_row( string $keyword, string $url, string $title, stri
     // Row cells: the HTML. Replace every %stuff% in 'template' with 'stuff' value.
     $row = "<tr id=\"id-$id\">";
     foreach( $cells as $cell_id => $elements ) {
-        $row .= sprintf( '<td class="%s" id="%s">', $cell_id, $cell_id . '-' . $id );
+        $row .= sprintf( '<td class="%s" id="%s" data-label="%s">', $cell_id, $cell_id . '-' . $id, yourls_esc_attr( $elements['label'] ?? '' ) );
         $row .= preg_replace_callback( '/%([^%]+)?%/', function( $match ) use ( $elements ) { return $elements[ $match[1] ]; }, $elements['template'] );
         $row .= '</td>';
     }
@@ -721,10 +742,9 @@ function yourls_table_head() {
 
     $cells = yourls_apply_filter( 'table_head_cells', array(
         'shorturl' => yourls__( 'Short URL' ),
-        'longurl'  => yourls__( 'Original URL' ),
-        'date'     => yourls__( 'Date' ),
-        'ip'       => yourls__( 'IP' ),
+        'longurl'  => yourls__( 'Destination URL' ),
         'clicks'   => yourls__( 'Clicks' ),
+        'date'     => yourls__( 'Created Date' ),
         'actions'  => yourls__( 'Actions' )
     ) );
     foreach( $cells as $k => $v ) {
@@ -796,6 +816,11 @@ function yourls_login_screen( string $error_msg = '' ) {
     ?>
     <main role="main">
         <div id="login">
+            <div class="section_heading login_heading">
+                <span class="eyebrow"><?php yourls_e( 'Secure Access' ); ?></span>
+                <h2><?php yourls_e( 'Sign in to GK Links' ); ?></h2>
+                <p><?php yourls_e( 'Manage branded short links, performance, and routing from one dashboard.' ); ?></p>
+            </div>
             <form method="post" action="<?php echo yourls_esc_attr($action); ?>"> <?php // reset any QUERY parameters ?>
                 <?php
                     if( !empty( $error_msg ) ) {
@@ -838,12 +863,14 @@ function yourls_login_screen( string $error_msg = '' ) {
  */
 function yourls_html_menu() {
     // Build menu links
+    $current_user = '';
     if( defined( 'YOURLS_USER' ) ) {
         // Create a logout link with a nonce associated to fake user 'logout' : the user is not yet defined
         // when the logout check is done -- see yourls_is_valid_user()
         $logout_url = yourls_nonce_url( 'admin_logout',
         yourls_add_query_arg(['action' => 'logout'], yourls_admin_url('index.php')), 'nonce', 'logout');
-        $logout_link = yourls_apply_filter('logout_link', sprintf( yourls__('Hello <strong>%s</strong>'), YOURLS_USER ) . ' (<a href="' . $logout_url . '" title="' . yourls_esc_attr__( 'Logout' ) . '">' . yourls__( 'Logout' ) . '</a>)' );
+        $current_user = YOURLS_USER;
+        $logout_link = yourls_apply_filter('logout_link', '<a href="' . $logout_url . '" title="' . yourls_esc_attr__( 'Logout' ) . '">' . yourls__( 'Logout' ) . '</a>' );
     } else {
         $logout_link = yourls_apply_filter( 'logout_link', '' );
     }
@@ -852,10 +879,15 @@ function yourls_html_menu() {
     $admin_links    = array();
     $admin_sublinks = array();
 
-    $admin_links['admin'] = array(
+    $admin_links['dashboard'] = array(
         'url'    => yourls_admin_url( 'index.php' ),
-        'title'  => yourls__( 'Go to the admin interface' ),
-        'anchor' => yourls__( 'Admin interface' )
+        'title'  => yourls__( 'Go to the dashboard' ),
+        'anchor' => yourls__( 'Dashboard' )
+    );
+    $admin_links['links'] = array(
+        'url'    => yourls_admin_url( 'index.php' ) . '#links-table-section',
+        'title'  => yourls__( 'Jump to links' ),
+        'anchor' => yourls__( 'Links' )
     );
 
     if( yourls_is_admin() ) {
@@ -863,20 +895,18 @@ function yourls_html_menu() {
             'url'    => yourls_admin_url( 'tools.php' ),
             'anchor' => yourls__( 'Tools' )
         );
-        $admin_links['plugins'] = array(
+        $admin_links['settings'] = array(
             'url'    => yourls_admin_url( 'plugins.php' ),
-            'anchor' => yourls__( 'Manage Plugins' )
+            'anchor' => yourls__( 'Settings' )
         );
-        $admin_sublinks['plugins'] = yourls_list_plugin_admin_pages();
+        $admin_sublinks['settings'] = yourls_list_plugin_admin_pages();
     }
 
     $admin_links    = yourls_apply_filter( 'admin_links',    $admin_links );
     $admin_sublinks = yourls_apply_filter( 'admin_sublinks', $admin_sublinks );
 
     // Now output menu
-    echo '<nav role="navigation"><ul id="admin_menu">'."\n";
-    if ( yourls_is_private() && !empty( $logout_link ) )
-        echo '<li id="admin_menu_logout_link">' . $logout_link .'</li>';
+    echo '<nav id="top_navigation" role="navigation"><ul id="admin_menu">'."\n";
 
     foreach( (array)$admin_links as $link => $ar ) {
         if( isset( $ar['url'] ) ) {
@@ -899,7 +929,11 @@ function yourls_html_menu() {
     }
 
     if ( isset( $help_link ) )
-        echo '<li id="admin_menu_help_link">' . $help_link .'</li>';
+        echo '<li id="admin_menu_help_link" class="admin_menu_secondary">' . $help_link .'</li>';
+    if ( $current_user )
+        echo '<li id="admin_menu_user" class="admin_menu_secondary admin_menu_user">' . yourls_esc_html( $current_user ) . '</li>';
+    if ( yourls_is_private() && !empty( $logout_link ) )
+        echo '<li id="admin_menu_logout_link" class="admin_menu_secondary">' . $logout_link .'</li>';
 
     yourls_do_action( 'admin_menu' );
     echo "</ul></nav>\n";

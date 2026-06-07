@@ -69,6 +69,27 @@ function toggle_share_fill_boxes( url, shorturl, title ) {
 	$('#tweet_body').keypress();
 }
 
+function copy_row_shorturl(id) {
+	var shorturl = $('#keyword-' + id + ' a:first').attr('href');
+	if (!shorturl) {
+		return false;
+	}
+
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(shorturl).then(function() {
+			feedback('Short URL copied to clipboard', 'success');
+		}, function() {
+			toggle_share_fill_boxes($('#url-' + id + ' a:first').attr('href'), shorturl, $('#url-' + id + ' a:first').attr('title'));
+			feedback('Short URL ready to copy', 'success');
+		});
+	} else {
+		toggle_share_fill_boxes($('#url-' + id + ' a:first').attr('href'), shorturl, $('#url-' + id + ' a:first').attr('title'));
+		feedback('Short URL ready to copy', 'success');
+	}
+
+	return false;
+}
+
 // Display the edition interface
 function edit_link_display(id) {
 	if( $('#edit-button-'+id).hasClass('disabled') ) {
@@ -217,24 +238,38 @@ function add_link_reset() {
 	$('#add-keyword').val('');
 }
 
+function numeric_value_from_text(value) {
+	var normalized = String(value || '').replace(/[^0-9.-]/g, '');
+	return normalized === '' ? 0 : parseInt(normalized, 10);
+}
+
+function format_dashboard_number(value) {
+	return Number(value || 0).toLocaleString();
+}
+
 // Increment URL counters
 function increment_counter() {
 	$('.increment').each(function(){
-		$(this).html( parseInt($(this).html()) + 1);
+		$(this).html(format_dashboard_number(numeric_value_from_text($(this).text()) + 1));
 	});
 }
 
 // Decrement URL counters
 function decrement_counter() {
 	$('.increment').each(function(){
-		$(this).html( parseInt($(this).html()) - 1 );
+		$(this).html(format_dashboard_number(Math.max(0, numeric_value_from_text($(this).text()) - 1)));
 	});
 }
 
 // Decrease number of total clicks
 function decrease_total_clicks( id ) {
 	var total_clicks = $("#overall_tracking strong:nth-child(2)");
-	total_clicks.html( parseInt( total_clicks.html() ) - parseInt( $('#clicks-' + id).html() ) );
+	var dashboard_total_clicks = $("#dashboard-total-clicks");
+	var next_total = Math.max(0, numeric_value_from_text(total_clicks.text()) - numeric_value_from_text($('#clicks-' + id).text()));
+	total_clicks.html(
+		format_dashboard_number(next_total)
+	);
+	dashboard_total_clicks.html(format_dashboard_number(next_total));
 }
 
 // Toggle Share box
