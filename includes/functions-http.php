@@ -319,7 +319,7 @@ function yourls_check_core_version() {
         'yourls_url_convert' => defined( 'YOURLS_URL_CONVERT' ) ? YOURLS_URL_CONVERT : 'unknown',
 
         // Usage information
-        'num_users'          => count( $yourls_user_passwords ),
+        'num_users'          => count( (array) $yourls_user_passwords ),
         'num_active_plugins' => yourls_has_active_plugins(),
         'num_pages'          => defined( 'YOURLS_PAGEDIR' ) ? count( (array) glob( YOURLS_PAGEDIR .'/*.php') ) : 0,
         'num_links'          => $total_urls,
