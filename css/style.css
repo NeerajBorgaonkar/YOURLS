@@ -125,6 +125,8 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: relative;
+    z-index: 50;
     gap: 12px;
     background: rgba(23, 23, 23, 0.88);
     border: 1px solid var(--gk-border);
@@ -186,6 +188,7 @@ ul#admin_menu > li > a:focus {
 
 .hamburger_menu {
     position: relative;
+    z-index: 51;
 }
 
 .hamburger_menu summary {
@@ -221,7 +224,7 @@ ul#admin_menu > li > a:focus {
     border-radius: 20px;
     background: rgba(32, 32, 32, 0.98);
     box-shadow: var(--gk-shadow);
-    z-index: 30;
+    z-index: 60;
 }
 
 .hamburger_user {
