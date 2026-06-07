@@ -24,6 +24,16 @@ $request = yourls_get_request();
 // Now load required template and exit
 yourls_do_action( 'pre_load_template', $request );
 
+// Handle root request explicitly to avoid redirecting YOURLS_SITE to itself
+if ( $request === '' ) {
+    if ( yourls_is_private() ) {
+        yourls_redirect( yourls_admin_url(), 302 );
+    } else {
+        yourls_redirect( yourls_admin_url(), 302 );
+    }
+    exit;
+}
+
 // Let's look at the request : what we want to catch here is "anything", or "anything+" / "anything+all" (stat page)
 preg_match( "@^(.+?)(\+(all)?)?/?$@", $request, $matches );
 $keyword   = isset($matches[1]) ? $matches[1] : null; // 'anything' whatever the request is (keyword, bookmarklet URL...)
