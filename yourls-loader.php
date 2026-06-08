@@ -26,11 +26,7 @@ yourls_do_action( 'pre_load_template', $request );
 
 // Handle root request explicitly to avoid redirecting YOURLS_SITE to itself
 if ( $request === '' ) {
-    if ( yourls_is_private() ) {
-        yourls_redirect( yourls_admin_url(), 302 );
-    } else {
-        yourls_redirect( yourls_admin_url(), 302 );
-    }
+    yourls_redirect( GK_LINKS_ROOT_REDIRECT_URL, 302 );
     exit;
 }
 
