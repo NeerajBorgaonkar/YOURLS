@@ -57,6 +57,7 @@ If you want Coolify-managed MySQL as a separate resource:
 - `YOURLS_UNIQUE_URLS` - defaults to `false` so you can create multiple tracked short links for the same destination
 - `YOURLS_URL_CONVERT` - defaults to `62` for shorter mixed-case slugs
 - `YOURLS_NO_VERSION_CHECK` - leave `false` in production unless you intentionally disable update checks
+- `GK_LINKS_PUBLIC_SITE` - public short-link domain shown in the dashboard and copied to clipboard, defaults to `https://marathimarket.in`
 - `GK_LINKS_ROOT_REDIRECT_URL` - where bare-domain visits like `/` should land, defaults to `https://www.guntavnook.com`
 
 ## Branding controls

@@ -89,6 +89,7 @@ define( 'GK_LINKS_APP_NAME', gk_links_env( 'GK_LINKS_APP_NAME', 'GK Links' ) );
 define( 'GK_LINKS_TAGLINE', gk_links_env( 'GK_LINKS_TAGLINE', 'Your private short-link and tracking platform' ) );
 define( 'GK_LINKS_LOGO_URL', gk_links_env( 'GK_LINKS_LOGO_URL', '' ) );
 define( 'GK_LINKS_FOOTER_HTML', gk_links_env( 'GK_LINKS_FOOTER_HTML', 'Powered by <a href="https://github.com/NeerajBorgaonkar/YOURLS" title="GK Links source">GK Links</a>' ) );
+define( 'GK_LINKS_PUBLIC_SITE', rtrim( gk_links_env( 'GK_LINKS_PUBLIC_SITE', 'https://marathimarket.in' ), '/' ) );
 define( 'GK_LINKS_ROOT_REDIRECT_URL', rtrim( gk_links_env( 'GK_LINKS_ROOT_REDIRECT_URL', 'https://www.guntavnook.com' ), '/' ) );
 
 $yourls_user_passwords = [

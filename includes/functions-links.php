@@ -135,7 +135,7 @@ function yourls_link( $keyword = '', $stats = false ) {
     if( $stats  === true ) {
         $keyword = $keyword . '+';
     }
-    $link    = yourls_normalize_uri( yourls_get_yourls_site() . '/' . $keyword );
+    $link    = yourls_normalize_uri( yourls_get_public_site() . '/' . $keyword );
 
     if( yourls_is_ssl() ) {
         $link = yourls_set_url_scheme( $link, 'https' );
@@ -204,6 +204,18 @@ function yourls_site_url($echo = true, $url = '' ) {
  */
 function yourls_get_yourls_site() {
     return yourls_apply_filter('get_yourls_site', trim(YOURLS_SITE, '/'));
+}
+
+/**
+ * Get the public domain used when generating short URLs for copying and sharing.
+ *
+ * This may differ from the canonical/admin domain used by YOURLS_SITE.
+ *
+ * @return string Public short-link base URL
+ */
+function yourls_get_public_site() {
+    $site = defined( 'GK_LINKS_PUBLIC_SITE' ) ? GK_LINKS_PUBLIC_SITE : YOURLS_SITE;
+    return yourls_apply_filter( 'get_public_site', trim( $site, '/' ) );
 }
 
 /**
