@@ -1,10 +1,14 @@
-FROM php:8.3-apache
+FROM php:8.3.36-apache
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libzip-dev unzip \
     && docker-php-ext-install pdo_mysql \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
+
+# PHP security (Oct 2026): 8.3.36 fixes CVE-2026-109618/109619; no fix yet for
+# CVE-2026-115560, so session upload progress stays off (YOURLS doesn't use it).
+RUN echo "session.upload_progress.enabled = Off" > /usr/local/etc/php/conf.d/zz-security.ini
 
 COPY docker/apache-site.conf /etc/apache2/sites-available/000-default.conf
 COPY . /var/www/html
